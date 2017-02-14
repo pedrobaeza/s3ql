@@ -317,6 +317,16 @@ def get_backend_factory(storage_url, backend_options, authfile,
         backend_passphrase = getopt('backend-password') or backend_passphrase
         fs_passphrase = getopt('fs-passphrase') or fs_passphrase
 
+        if pattern == 'hubic://':
+            # specific hubiC config - stored as backend options
+            for param in ('client-id', 'client-secret', 'redirect-uri', 'refresh-token'):
+                backend_options[param] = getopt(param)
+                if not backend_options[param]:
+                    if sys.stdin.isatty():
+                        backend_options[param] = getpass(param + u': ')
+                    else:
+                        backend_options[param] = sys.stdin.readline().rstrip()
+
     if not backend_login and backend_class.needs_login:
         if sys.stdin.isatty():
             backend_login = getpass("Enter backend login: ")
